@@ -1,6 +1,6 @@
 <div class="col-lg-8 container-sm">
   <h3 class=mb-3>
-    Results for <%= link_to @job.package_name, "https://packages.ecosyste.ms/registries/#{@job.registry}/packages/#{@job.package_name}" %> from <%= link_to @job.registry, "https://packages.ecosyste.ms/registries/#{@job.registry}/packages" %>
+    Results for <%= link_to @job.package_name, "https://packages.ecosyste.ms/registries/#{@job.registry}/packages/#{@job.package_name}" %> from <%= link_to @job.registry, "https://packages.ecosyste.ms/registries/#{@job.registry}/packages" %>    
   </h3>
 
   <% if @job.status == 'complete' %>
@@ -18,6 +18,9 @@
         <% end %>
       </ul>
     </div>
+    <small class='text-muted'>
+      Generated on <%= @job.updated_at.strftime("%d %b %Y %H:%M") %>
+    </small>
   <% end %>
 
   <% if @job.status == 'pending' %>
