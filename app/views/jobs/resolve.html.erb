@@ -1,10 +1,23 @@
 <div class="col-lg-8 container-sm">
   <h3 class=mb-3>
-    Resolved Dependency Tree for <%= @job.package_name %> from <%= @job.registry %>
+    Results for <%= link_to @job.package_name, "https://packages.ecosyste.ms/registries/#{@job.registry}/packages/#{@job.package_name}" %> from <%= link_to @job.registry, "https://packages.ecosyste.ms/registries/#{@job.registry}/packages" %>
   </h3>
 
   <% if @job.status == 'complete' %>
-    <%= @job.results %>
+    <div class="card mb-3">
+      <div class="card-header">
+        Dependencies
+      </div>
+      <ul class="list-group list-group-flush">
+          <% @job.results.each do |k,v| %>
+            <% next if k == 'root'%>
+            <li class="list-group-item">
+              <%= link_to k, "https://packages.ecosyste.ms/registries/#{@job.registry}/packages/#{k}" %>
+              <i><%= link_to v, "https://packages.ecosyste.ms/registries/#{@job.registry}/packages/#{k}/versions/#{v}" %></i>
+            </li>
+        <% end %>
+      </ul>
+    </div>
   <% end %>
 
   <% if @job.status == 'pending' %>
