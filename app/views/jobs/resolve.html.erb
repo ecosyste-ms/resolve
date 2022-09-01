@@ -1,0 +1,18 @@
+<div class="col-lg-8 container-sm">
+  <h3 class=mb-3>
+    Resolved Dependency Tree for <%= @job.package_name %> from <%= @job.registry %>
+  </h3>
+
+  <% if @job.status == 'complete' %>
+    <%= @job.results %>
+  <% end %>
+
+  <% if @job.status == 'pending' %>
+    Processing dependencies...
+    <meta http-equiv="refresh" content="2">
+  <% end %>
+
+  <% if @job.status == 'error' %>
+    Error resolving: <code><%= @job.results['error'] %></code>
+  <% end %>
+</div>
