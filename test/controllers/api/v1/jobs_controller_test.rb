@@ -1,6 +1,11 @@
 require 'test_helper'
 
 class ApiV1JobsControllerTest < ActionDispatch::IntegrationTest
+
+  setup do
+    Registry.create(name: 'rubygems.org', url: 'https://rubygems.org', ecosystem: 'rubygems', packages_count: 1000)
+  end
+
   test 'submit a job' do
     post api_v1_jobs_path(registry: 'rubygems.org', package_name: 'rails')
     assert_response :redirect
@@ -14,7 +19,7 @@ class ApiV1JobsControllerTest < ActionDispatch::IntegrationTest
     actual_response = JSON.parse(@response.body)
 
     assert_equal actual_response["title"], "Bad Request"
-    assert_equal actual_response["details"], ["Package name can't be blank", "Registry can't be blank"]
+    assert_equal actual_response["details"], ["Package name can't be blank", "Registry can't be blank", "Registry is not included in the list"]
   end
 
   test 'check on a job' do

@@ -1,11 +1,7 @@
 <div class="col-lg-4 container-sm text-center">
   <form class="row g-2 justify-content-center" action='<%= resolve_path %>'>
-    <div class="col-auto">
-      <input name='registry' type="text" class="form-control" id="registry" placeholder="Registry: eg rubygems.org" size="50" required>
-      <input name='package_name' type="text" class="form-control" id="package_name" placeholder="Package Name: eg rails" size="50" required>
-    </div>
-    <div class="col-auto">
+      <%= select_tag "registry", options_from_collection_for_select(@registries, "name", "name"), class: "form-select", include_blank: 'Select registry...' %>
+      <input name='package_name' type="text" class="form-control" id="package_name" placeholder="Package Name: eg rails" size="20" required>
       <button type="submit" class="btn btn-primary mb-3">Resolve</button>
-    </div>
   </form>
 </div>

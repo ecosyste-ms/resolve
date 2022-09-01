@@ -1,6 +1,7 @@
 class Job < ApplicationRecord
   validates_presence_of :package_name, :registry
   validates_uniqueness_of :id
+  validates :registry, :inclusion => { :in => Registry.all.pluck(:name) }
 
   scope :status, ->(status) { where(status: status) }
 
