@@ -1,3 +1,5 @@
+require 'timeout'
+
 class Job < ApplicationRecord
   validates_presence_of :package_name, :registry
   validates_uniqueness_of :id
@@ -30,11 +32,12 @@ class Job < ApplicationRecord
 
   def resolve
     begin
-      # TODO timeout
-      source = EcosystemsPackageSource.new({ package_name => '>=0 ' }, registry)
+      Timeout::timeout(60) do
+        source = EcosystemsPackageSource.new({ package_name => '>=0 ' }, registry)
       solver = PubGrub::VersionSolver.new(source: source)
       result = solver.solve  
       update(status: 'complete', results: result)
+      end
     rescue => e
       update(results: {error: e.inspect}, status: 'error')
     end
