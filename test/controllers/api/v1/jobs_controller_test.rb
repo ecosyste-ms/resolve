@@ -3,7 +3,7 @@ require 'test_helper'
 class ApiV1JobsControllerTest < ActionDispatch::IntegrationTest
 
   setup do
-    Registry.create(name: 'rubygems.org', url: 'https://rubygems.org', ecosystem: 'rubygems', packages_count: 1000)
+    Registry.create!(name: 'rubygems.org', url: 'https://rubygems.org', ecosystem: 'rubygems', packages_count: 1000)
   end
 
   test 'submit a job' do
