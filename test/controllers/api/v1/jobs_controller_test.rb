@@ -3,11 +3,11 @@ require 'test_helper'
 class ApiV1JobsControllerTest < ActionDispatch::IntegrationTest
 
   setup do
-    Registry.create!(name: 'rubygems.org', url: 'https://rubygems.org', ecosystem: 'rubygems', packages_count: 1000)
+    @registry = Registry.create!(name: 'rubygems.org', url: 'https://rubygems.org', ecosystem: 'rubygems', packages_count: 1000)
   end
 
   test 'submit a job' do
-    post api_v1_jobs_path(registry: 'rubygems.org', package_name: 'rails')
+    post api_v1_jobs_path(registry: @registry.name, package_name: 'rails')
     assert_response :redirect
     assert_match /\/api\/v1\/jobs\//, @response.location
   end
@@ -23,7 +23,7 @@ class ApiV1JobsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'check on a job' do
-    @job = Job.create(registry: 'rubygems.org', package_name: 'rails')
+    @job = Job.create(registry: @registry.name, package_name: 'rails')
     
     @job.expects(:check_status)
     Job.expects(:find).with(@job.id).returns(@job)
