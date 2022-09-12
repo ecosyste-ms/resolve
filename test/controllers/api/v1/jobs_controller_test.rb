@@ -4,9 +4,12 @@ class ApiV1JobsControllerTest < ActionDispatch::IntegrationTest
 
   setup do
     @registry = Registry.create!(name: 'rubygems.org', url: 'https://rubygems.org', ecosystem: 'rubygems', packages_count: 1000)
+    p @registry
   end
 
   test 'submit a job' do
+    p @registry
+    p Registry.all.pluck(:name)
     post api_v1_jobs_path(registry: @registry.name, package_name: 'rails')
     assert_response :redirect
     assert_match /\/api\/v1\/jobs\//, @response.location
@@ -23,6 +26,8 @@ class ApiV1JobsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'check on a job' do
+    p @registry
+    p Registry.all.pluck(:name)
     @job = Job.create(registry: @registry.name, package_name: 'rails')
     
     @job.expects(:check_status)
