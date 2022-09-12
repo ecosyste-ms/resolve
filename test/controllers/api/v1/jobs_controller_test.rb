@@ -9,7 +9,7 @@ class ApiV1JobsControllerTest < ActionDispatch::IntegrationTest
 
   test 'submit a job' do
     p @registry
-    p Registry.all.pluck(:name)
+    p Registry.pluck(:name)
     post api_v1_jobs_path(registry: @registry.name, package_name: 'rails')
     assert_response :redirect
     assert_match /\/api\/v1\/jobs\//, @response.location
@@ -27,9 +27,9 @@ class ApiV1JobsControllerTest < ActionDispatch::IntegrationTest
 
   test 'check on a job' do
     p @registry
-    p Registry.all.pluck(:name)
+    p Registry.pluck(:name)
     @job = Job.create!(registry: @registry.name, package_name: 'rails')
-    
+    p @job
     @job.expects(:check_status)
     Job.expects(:find).with(@job.id).returns(@job)
 
