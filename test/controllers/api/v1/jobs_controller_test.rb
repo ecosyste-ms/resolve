@@ -28,7 +28,7 @@ class ApiV1JobsControllerTest < ActionDispatch::IntegrationTest
   test 'check on a job' do
     p @registry
     p Registry.all.pluck(:name)
-    @job = Job.create(registry: @registry.name, package_name: 'rails')
+    @job = Job.create!(registry: @registry.name, package_name: 'rails')
     
     @job.expects(:check_status)
     Job.expects(:find).with(@job.id).returns(@job)
