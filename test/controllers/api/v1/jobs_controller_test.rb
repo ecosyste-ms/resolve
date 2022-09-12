@@ -2,22 +2,17 @@ require 'test_helper'
 
 class ApiV1JobsControllerTest < ActionDispatch::IntegrationTest
 
-  # setup do
-  #   # Registry.delete_all
-    
-  #   p @registry
-  # end
+  setup do
+    @registry = Registry.create!(name: 'rubygems.org', url: 'https://rubygems.org', ecosystem: 'rubygems', packages_count: 1000)
+  end
 
   test 'submit a job' do
-    @registry = Registry.create!(name: 'rubygems.com', url: 'https://rubygems.com', ecosystem: 'rubygems', packages_count: 1000)
-    p Registry.pluck(:name)
     post api_v1_jobs_path(registry: @registry.name, package_name: 'rails')
     assert_response :redirect
     assert_match /\/api\/v1\/jobs\//, @response.location
   end
 
   test 'submit an invalid job' do
-    @registry = Registry.create!(name: 'rubygems.com', url: 'https://rubygems.com', ecosystem: 'rubygems', packages_count: 1000)
     post api_v1_jobs_path
     assert_response :bad_request
 
@@ -28,12 +23,7 @@ class ApiV1JobsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'check on a job' do
-    @registry = Registry.create!(name: 'rubygems.com', url: 'https://rubygems.com', ecosystem: 'rubygems', packages_count: 1000)
-    p @registry
-    p Registry.pluck(:name)
-    @job = Job.new(registry: @registry.name, package_name: 'rails')
-    p @job
-    @job.save!
+    @job = Job.create(registry: @registry.name, package_name: 'rails')
     @job.expects(:check_status)
     Job.expects(:find).with(@job.id).returns(@job)
 

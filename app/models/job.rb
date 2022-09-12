@@ -6,10 +6,6 @@ class Job < ApplicationRecord
   validate :registry_name
   
   def registry_name
-    p 'validating registry name'
-    p Registry.all_names
-    p registry
-    p Registry.all_names.include?(registry)
     if !Registry.all_names.include?(registry)
       errors.add(:registry, "is not included in the list")
     end
