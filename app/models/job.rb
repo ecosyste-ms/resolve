@@ -1,4 +1,4 @@
-# require 'timeout'
+require 'timeout'
 
 class Job < ApplicationRecord
   validates_presence_of :package_name, :registry
