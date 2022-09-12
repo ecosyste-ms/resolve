@@ -1,9 +1,9 @@
-require 'timeout'
+# require 'timeout'
 
 class Job < ApplicationRecord
-  validates_presence_of :package_name, :registry
-  validates_uniqueness_of :id
-  validates :registry, inclusion: Registry.pluck(:name)
+  validates_presence_of :package_name#, :registry
+  # validates_uniqueness_of :id
+  validates :registry, presence: true, inclusion: {in: Registry.all_names }
 
   scope :status, ->(status) { where(status: status) }
 

@@ -1,5 +1,9 @@
 class Registry < ApplicationRecord
 
+  def self.all_names
+    @names ||= Registry.all.map(&:name)
+  end
+
   def self.sync_registries
     resp = Faraday.get('https://packages.ecosyste.ms/api/v1/registries')
     return unless resp.success?
