@@ -16,15 +16,16 @@ class ApiV1JobsControllerTest < ActionDispatch::IntegrationTest
     assert_match /\/api\/v1\/jobs\//, @response.location
   end
 
-  # test 'submit an invalid job' do
-  #   post api_v1_jobs_path
-  #   assert_response :bad_request
+  test 'submit an invalid job' do
+    @registry = Registry.create!(name: 'rubygems.com', url: 'https://rubygems.com', ecosystem: 'rubygems', packages_count: 1000)
+    post api_v1_jobs_path
+    assert_response :bad_request
 
-  #   actual_response = JSON.parse(@response.body)
+    actual_response = JSON.parse(@response.body)
 
-  #   assert_equal actual_response["title"], "Bad Request"
-  #   assert_equal actual_response["details"], ["Package name can't be blank", "Registry can't be blank", "Registry is not included in the list"]
-  # end
+    assert_equal actual_response["title"], "Bad Request"
+    assert_equal actual_response["details"], ["Package name can't be blank", "Registry can't be blank", "Registry is not included in the list"]
+  end
 
   test 'check on a job' do
     @registry = Registry.create!(name: 'rubygems.com', url: 'https://rubygems.com', ecosystem: 'rubygems', packages_count: 1000)

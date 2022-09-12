@@ -1,7 +1,7 @@
 class Registry < ApplicationRecord
 
   def self.all_names
-    @names ||= Registry.all.map(&:name)
+    Registry.all.map(&:name)
   end
 
   def self.sync_registries

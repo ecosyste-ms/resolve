@@ -1,9 +1,19 @@
 # require 'timeout'
 
 class Job < ApplicationRecord
-  validates_presence_of :package_name#, :registry
-  # validates_uniqueness_of :id
-  validates :registry, presence: true, inclusion: {in: Registry.all_names }
+  validates_presence_of :package_name, :registry
+  validates_uniqueness_of :id
+  validate :registry_name
+  
+  def registry_name
+    p 'validating registry name'
+    p Registry.all_names
+    p registry
+    p Registry.all_names.include?(registry)
+    if !Registry.all_names.include?(registry)
+      errors.add(:registry, "is not included in the list")
+    end
+  end
 
   scope :status, ->(status) { where(status: status) }
 
