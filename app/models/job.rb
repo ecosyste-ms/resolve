@@ -40,9 +40,9 @@ class Job < ApplicationRecord
     begin
       Timeout::timeout(60) do
         source = EcosystemsPackageSource.new({ package_name => '>=0 ' }, registry)
-      solver = PubGrub::VersionSolver.new(source: source)
-      result = solver.solve  
-      update(status: 'complete', results: result)
+        solver = PubGrub::VersionSolver.new(source: source)
+        result = solver.solve  
+        update(status: 'complete', results: result)
       end
     rescue => e
       update(results: {error: e.inspect}, status: 'error')

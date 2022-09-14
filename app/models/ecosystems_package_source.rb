@@ -43,6 +43,7 @@ class EcosystemsPackageSource < PubGrub::BasicPackageSource
   end
 
   def all_versions_for(package_name)
+    p 'all_versions_for', package_name
     fetch_package(package_name) unless @packages[package_name].keys.any?
     @packages[package_name].keys
   end
@@ -52,13 +53,15 @@ class EcosystemsPackageSource < PubGrub::BasicPackageSource
   end
 
   def dependencies_for(package, version)
+    p 'dependencies_for', package, version
     @packages[package][version]
   end
 
   def parse_dependency(package, dependency)
+    p 'parse_dependency', package, dependency
     fetch_package(package) unless @packages.key?(package)
     return false unless @packages.key?(package)
 
-    PubGrub::RubyGems.parse_constraint(package, dependency)
+    VersionParser.parse_constraint(package, dependency)
   end
 end

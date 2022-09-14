@@ -2,8 +2,8 @@ ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
 
-require 'webmock/minitest'
-require 'mocha/minitest'
+# require 'webmock/minitest'
+# require 'mocha/minitest'
 
 require 'sidekiq_unique_jobs/testing'
 require 'sidekiq/testing'
