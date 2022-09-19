@@ -15,12 +15,12 @@ class EcosystemsPackageSourceTest < ActiveSupport::TestCase
     assert_equal result['connection_pool'], '2.2.5'
   end
 
-  def test_resolving_npm_dependencies
-    source = EcosystemsPackageSource.new({ 'express' => '>= 0' }, 'npmjs.org')
+  # def test_resolving_npm_dependencies
+  #   source = EcosystemsPackageSource.new({ 'express' => '>= 0' }, 'npmjs.org')
 
-    solver = PubGrub::VersionSolver.new(source: source)
-    result = solver.solve
-    assert_equal result['redis-client'], '0.7.1'
-    assert_equal result['connection_pool'], '2.2.5'
-  end
+  #   solver = PubGrub::VersionSolver.new(source: source)
+  #   result = solver.solve
+  #   assert_equal result['redis-client'], '0.7.1'
+  #   assert_equal result['connection_pool'], '2.2.5'
+  # end
 end
