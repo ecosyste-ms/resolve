@@ -46,7 +46,6 @@ paths:
           required: false
           schema:
             type: string
-            format: date-time
       responses:
         301:
           description: Redirect
@@ -101,3 +100,5 @@ components:
         before:
           type: string
           format: date-time
+        version:
+          type: string
