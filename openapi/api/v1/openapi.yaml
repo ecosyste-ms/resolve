@@ -1,0 +1,96 @@
+openapi: 3.0.1
+info:
+  title: "Ecosyste.ms: Resolve"
+  description: "An open API service to resolve dependency trees of packages for many open source software ecosystems."
+  contact:
+    name: Ecosyste.ms
+    email: support@ecosyste.ms
+    url: https://ecosyste.ms 
+  version: 1.0.0
+  license:
+    name: CC-BY-4.0
+    url: https://creativecommons.org/licenses/by/4.0/
+externalDocs:
+  description: GitHub Repository
+  url: https://github.com/ecosyste-ms/resolve
+servers:
+- url: https://resolve.ecosyste.ms/api/v1
+paths:
+  /jobs:
+    post:
+      summary: submit a resolve job
+      operationId: createJob
+      parameters:
+        - name: package_name
+          in: query
+          description: name of the package
+          required: true
+          schema:
+            type: string
+        - name: registry
+          in: query
+          description: name of the package registry
+          required: true
+          schema:
+            type: string
+        - name: before
+          in: query
+          description: resolve only with versions before this date
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        301:
+          description: Redirect
+          headers:
+            location:
+              description: URL of submitted job
+              schema:
+                type: string
+  /jobs/{jobID}:
+    get:
+      summary: fetch job by id
+      operationId: getJob
+      parameters:
+        - in: path
+          name: jobID
+          schema:
+            type: string
+          required: true
+          description: id of job
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+components:
+  schemas:
+    Job:
+      type: object
+      properties:
+        id:
+          type: string
+        package_name:
+          type: string
+        registry:
+          type: string
+        status:
+          type: string
+        results:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        sidekiq_id:
+          type: string
+        sha256:
+          type: string
+        before:
+          type: string
+          format: date-time
