@@ -1,1 +1,1 @@
-json.extract! @job, :id, :url, :package_name, :registry, :status, :results, :created_at, :updated_at, :sidekiq_id, :sha256, :before 
+json.extract! @job, :id, :url, :package_name, :registry, :status, :results, :created_at, :updated_at, :sidekiq_id, :sha256, :before, :version

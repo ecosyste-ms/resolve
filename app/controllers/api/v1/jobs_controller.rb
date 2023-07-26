@@ -1,6 +1,6 @@
 class Api::V1::JobsController < Api::V1::ApplicationController
   def create
-    @job = Job.new(registry: params[:registry], package_name: params[:package_name], status: 'pending', ip: request.remote_ip, before: params[:before])
+    @job = Job.new(registry: params[:registry], package_name: params[:package_name], status: 'pending', ip: request.remote_ip, before: params[:before], version: version)
     if @job.save
       @job.resolve_async
       redirect_to api_v1_job_path(@job)
@@ -20,5 +20,10 @@ class Api::V1::JobsController < Api::V1::ApplicationController
 
   def formats
     render json: Job.formats
+  end
+
+  def version
+    return '>= 0' if params[:version].blank?
+    params[:version]
   end
 end

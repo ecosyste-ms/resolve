@@ -35,7 +35,14 @@ paths:
             type: string
         - name: before
           in: query
-          description: resolve only with versions before this date
+          description: resolve only with dependencies before this date
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: version
+          in: query
+          description: resolve only with version within this range
           required: false
           schema:
             type: string
