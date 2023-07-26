@@ -2,6 +2,7 @@
   <form class="row g-2 justify-content-center" action='<%= resolve_path %>'>
       <%= select_tag "registry", options_from_collection_for_select(@registries, "name", "name"), class: "form-select", include_blank: 'Select registry...' %>
       <input name='package_name' type="text" class="form-control" id="package_name" placeholder="Package Name: eg rails" size="20" required>
+      <input name='before' type="text" class="form-control" id="before" placeholder="Before datetime (optional)" size="20">
       <button type="submit" class="btn btn-primary mb-3">Resolve</button>
   </form>
 </div>

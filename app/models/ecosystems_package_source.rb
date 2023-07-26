@@ -6,10 +6,11 @@ require 'pub_grub/rubygems'
 
 class EcosystemsPackageSource < PubGrub::BasicPackageSource
 
-  def initialize(root_deps, registry)
+  def initialize(root_deps, registry, before = nil)
     # TODO parse root deps from file
     # TODO parse registry from file
     @registry = registry # TODO validate registry
+    @before = before
     @root_deps = root_deps 
 
     @packages = {}
@@ -26,7 +27,9 @@ class EcosystemsPackageSource < PubGrub::BasicPackageSource
   end
 
   def fetch_package(package_name)
-    resp = Faraday.get("https://packages.ecosyste.ms/api/v1/registries/#{@registry}/packages/#{package_name}/versions?per_page=1000")
+    url = "https://packages.ecosyste.ms/api/v1/registries/#{@registry}/packages/#{package_name}/versions?per_page=1000"
+    url += "&before=#{@before}" if @before
+    resp = Faraday.get(url)
     json = JSON.parse(resp.body) # TODO handle errors
    
     @packages[package_name] = {}
