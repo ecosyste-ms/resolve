@@ -185,7 +185,7 @@ GEM
     psych (5.1.1.1)
       stringio
     pub_grub (0.5.0)
-    public_suffix (5.0.3)
+    public_suffix (5.0.4)
     puma (6.4.0)
       nio4r (~> 2.0)
     racc (1.7.3)
