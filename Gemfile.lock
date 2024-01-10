@@ -122,7 +122,7 @@ GEM
     ffi (1.16.3)
     globalid (1.2.1)
       activesupport (>= 6.1)
-    google-protobuf (3.25.1)
+    google-protobuf (3.25.2)
     hashdiff (1.1.0)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
@@ -323,7 +323,7 @@ DEPENDENCIES
   faraday-follow_redirects
   faraday-gzip
   faraday-retry
-  google-protobuf (= 3.25.1)
+  google-protobuf (= 3.25.2)
   jbuilder
   mocha
   pg (~> 1.5)
