@@ -179,6 +179,7 @@ GEM
     nokogiri (1.16.7-x86_64-linux)
       racc (~> 1.4)
     numerizer (0.1.1)
+    ostruct (0.6.0)
     pg (1.5.8)
     pg_query (5.1.0)
       google-protobuf (>= 3.22.3)
@@ -334,6 +335,7 @@ DEPENDENCIES
   google-protobuf
   jbuilder
   mocha
+  ostruct
   pg (~> 1.5)
   pg_query
   pghero
@@ -362,7 +364,7 @@ DEPENDENCIES
   webmock
 
 RUBY VERSION
-   ruby 3.3.4p185
+   ruby 3.3.5p185
 
 BUNDLED WITH
    2.5.18
