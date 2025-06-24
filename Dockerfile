@@ -23,6 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libc6-dev \
     libyaml-dev \
     libffi-dev \
+    zlib1g-dev \
  && rm -rf /var/lib/apt/lists/* \
  && gem update --system \
  && gem install bundler foreman \
