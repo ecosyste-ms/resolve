@@ -1,4 +1,4 @@
-FROM ruby:3.4.4-alpine
+FROM ruby:3.4.4-slim
 
 ENV APP_ROOT=/usr/src/app
 ENV DATABASE_PORT=5432
@@ -12,18 +12,18 @@ COPY Gemfile Gemfile.lock $APP_ROOT/
 
 # * Setup system
 # * Install Ruby dependencies
-RUN apk add --update \
-    build-base \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
     netcat-openbsd \
     git \
     nodejs \
-    postgresql-dev \
+    libpq-dev \
     tzdata \
-    curl-dev \
-    libc6-compat \
-    yaml-dev \
+    libcurl4-openssl-dev \
+    libc6-dev \
+    libyaml-dev \
     libffi-dev \
- && rm -rf /var/cache/apk/* \
+ && rm -rf /var/lib/apt/lists/* \
  && gem update --system \
  && gem install bundler foreman \
  && bundle config --global frozen 1 \
