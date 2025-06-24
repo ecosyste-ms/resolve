@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libyaml-dev \
     libffi-dev \
     zlib1g-dev \
+    pkg-config \
  && rm -rf /var/lib/apt/lists/* \
  && gem update --system \
  && gem install bundler foreman \
