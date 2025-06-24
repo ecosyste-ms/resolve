@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
   def index
-    @registries = Registry.all
+    @registries = Registry.all.order(:name)
   end
 end
