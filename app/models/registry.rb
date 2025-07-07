@@ -1,11 +1,12 @@
 class Registry < ApplicationRecord
+  include EcosystemsApiClient
 
   def self.all_names
     Registry.all.map(&:name)
   end
 
   def self.sync_registries
-    resp = Faraday.get('https://packages.ecosyste.ms/api/v1/registries')
+    resp = ecosystems_connection.get('https://packages.ecosyste.ms/api/v1/registries')
     return unless resp.success?
     json = JSON.parse(resp.body)
 

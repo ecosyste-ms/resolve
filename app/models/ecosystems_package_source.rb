@@ -5,6 +5,7 @@ require 'pub_grub/basic_package_source'
 require 'pub_grub/rubygems'
 
 class EcosystemsPackageSource < PubGrub::BasicPackageSource
+  include EcosystemsApiClient
 
   def initialize(root_deps, registry, before = nil)
     # TODO parse root deps from file
@@ -29,7 +30,7 @@ class EcosystemsPackageSource < PubGrub::BasicPackageSource
   def fetch_package(package_name)
     url = "https://packages.ecosyste.ms/api/v1/registries/#{@registry}/packages/#{package_name}/versions?per_page=1000"
     url += "&before=#{@before}" if @before
-    resp = Faraday.get(url)
+    resp = ecosystems_connection.get(url)
     json = JSON.parse(resp.body) # TODO handle errors
    
     @packages[package_name] = {}
