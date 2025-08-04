@@ -357,7 +357,7 @@ DEPENDENCIES
   jbuilder
   mocha
   ostruct
-  pg (~> 1.5)
+  pg
   pg_query
   pghero
   pub_grub
