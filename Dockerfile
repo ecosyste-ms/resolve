@@ -25,12 +25,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libffi-dev \
     zlib1g-dev \
     pkg-config \
+    libjemalloc2 \
  && rm -rf /var/lib/apt/lists/* \
  && gem update --system \
  && gem install bundler foreman \
  && bundle config --global frozen 1 \
  && bundle config set without 'test' \
  && bundle install --jobs 2
+
+ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.2
+ENV RUBY_YJIT_ENABLE=1
 
 # ========================================================
 # Application layer
