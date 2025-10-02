@@ -14,4 +14,10 @@ module ApplicationHelper
   def app_description
     'An open API service to resolve dependency trees of packages for many open source software ecosystems. '
   end
+
+  def bootstrap_icon(symbol, options = {})
+    return "" if symbol.nil?
+    icon = BootstrapIcons::BootstrapIcon.new(symbol, options)
+    content_tag(:svg, icon.path.html_safe, icon.options)
+  end
 end
