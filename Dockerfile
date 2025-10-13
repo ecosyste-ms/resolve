@@ -1,50 +1,72 @@
-FROM ruby:3.4.6-slim
+# =============================================
+# Builder stage
+FROM ruby:3.4.7-alpine AS builder
 
 ENV APP_ROOT=/usr/src/app
-ENV DATABASE_PORT=5432
 WORKDIR $APP_ROOT
 
-# =============================================
-# System layer
-
-# Will invalidate cache as soon as the Gemfile changes
-COPY Gemfile Gemfile.lock $APP_ROOT/
-
-# * Setup system
-# * Install Ruby dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    netcat-openbsd \
+# Install build dependencies
+RUN apk add --no-cache \
+    build-base \
     git \
     nodejs \
-    libpq-dev \
+    postgresql-dev \
     tzdata \
-    libcurl4-openssl-dev \
-    libc6-dev \
-    libyaml-dev \
+    curl-dev \
+    yaml-dev \
     libffi-dev \
-    zlib1g-dev \
-    pkg-config \
-    libjemalloc2 \
- && rm -rf /var/lib/apt/lists/* \
- && gem update --system \
+    zlib-dev
+
+# Copy Gemfiles
+COPY Gemfile Gemfile.lock $APP_ROOT/
+
+# Install Ruby dependencies
+RUN gem update --system \
  && gem install bundler foreman \
  && bundle config --global frozen 1 \
  && bundle config set without 'test' \
  && bundle install --jobs 2
 
-ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.2
+# Copy application code
+COPY . $APP_ROOT
+
+# Precompile bootsnap cache
+RUN bundle exec bootsnap precompile --gemfile app/ lib/
+
+# Precompile assets for production
+RUN RAILS_ENV=production bundle exec rake assets:precompile
+
+# =============================================
+# Final stage
+FROM ruby:3.4.7-alpine
+
+ENV APP_ROOT=/usr/src/app
+ENV DATABASE_PORT=5432
+WORKDIR $APP_ROOT
+
+# Install runtime dependencies only
+RUN apk add --no-cache \
+    bash \
+    nodejs \
+    postgresql-libs \
+    tzdata \
+    curl \
+    yaml \
+    jemalloc \
+    netcat-openbsd
+
+ENV LD_PRELOAD=/usr/lib/libjemalloc.so.2
 ENV RUBY_YJIT_ENABLE=1
 
-# ========================================================
-# Application layer
+# Copy gems from builder
+COPY --from=builder /usr/local/bundle /usr/local/bundle
 
 # Copy application code
 COPY . $APP_ROOT
 
-# Precompile assets for a production environment.
-# This is done to include assets in production images on Dockerhub.
-RUN RAILS_ENV=production bundle exec rake assets:precompile
+# Copy precompiled assets and bootsnap cache from builder
+COPY --from=builder $APP_ROOT/public/assets $APP_ROOT/public/assets
+COPY --from=builder $APP_ROOT/tmp/cache $APP_ROOT/tmp/cache
 
 # Startup
 CMD ["bin/docker-start"]
