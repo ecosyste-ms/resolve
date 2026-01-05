@@ -25,7 +25,6 @@ gem "sidekiq"
 gem "sidekiq-unique-jobs"
 gem 'sidekiq-status'
 gem "pghero"
-gem "pg_query"
 gem 'bootstrap'
 gem 'rack-cors'
 gem 'rswag-api'
@@ -47,6 +46,7 @@ group :test do
   gem "webmock"
   gem "mocha"
   gem "rails-controller-testing"
+  gem "minitest", "~> 5"
 end
 
 gem "bootstrap-icons", require: "bootstrap_icons"
