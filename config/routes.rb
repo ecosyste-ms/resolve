@@ -14,6 +14,7 @@ Rails.application.routes.draw do
 
   namespace :api, :defaults => {:format => :json} do
     namespace :v1 do
+      resources :registries, only: [:index]
       resources :jobs do
         collection do
           get :index, to: 'jobs#create'

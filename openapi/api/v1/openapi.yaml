@@ -16,6 +16,19 @@ externalDocs:
 servers:
 - url: https://resolve.ecosyste.ms/api/v1
 paths:
+  /registries:
+    get:
+      summary: list available registries
+      operationId: listRegistries
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Registry'
   /jobs:
     post:
       summary: submit a resolve job
@@ -29,7 +42,7 @@ paths:
             type: string
         - name: registry
           in: query
-          description: name of the package registry
+          description: name of the package registry, see /registries for available values
           required: true
           schema:
             type: string
@@ -74,6 +87,17 @@ paths:
                 $ref: '#/components/schemas/Job'
 components:
   schemas:
+    Registry:
+      type: object
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        ecosystem:
+          type: string
+        packages_count:
+          type: integer
     Job:
       type: object
       properties:
