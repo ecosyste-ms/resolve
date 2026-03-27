@@ -35,6 +35,9 @@ gem 'pub_grub'
 gem 'semantic_range'
 gem 'semantic'
 gem 'ostruct'
+gem 'bigdecimal'
+gem 'cgi'
+gem 'matrix'
 
 
 group :development do

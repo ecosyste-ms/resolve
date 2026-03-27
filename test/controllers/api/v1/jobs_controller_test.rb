@@ -19,7 +19,19 @@ class ApiV1JobsControllerTest < ActionDispatch::IntegrationTest
     actual_response = JSON.parse(@response.body)
 
     assert_equal actual_response["title"], "Bad Request"
-    assert_equal actual_response["details"], ["Package name can't be blank", "Registry can't be blank", "Registry is not included in the list"]
+    assert_includes actual_response["details"], "Package name can't be blank"
+    assert_includes actual_response["details"], "Either registry or ecosystem must be provided"
+  end
+
+  test 'submit a job with ecosystem' do
+    post api_v1_jobs_path(ecosystem: 'gem', package_name: 'rails')
+    assert_response :redirect
+    assert_match /\/api\/v1\/jobs\//, @response.location
+  end
+
+  test 'submit a job with tree param' do
+    post api_v1_jobs_path(registry: @registry.name, package_name: 'rails', tree: 'true')
+    assert_response :redirect
   end
 
   test 'check on a job' do
