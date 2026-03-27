@@ -1,0 +1,23 @@
+openapi/api/v1/openapi.yaml
+  5e8b61bc86db520c 45-52,68-70,74-76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.20",
+  "base_commit_sha": "da57eb2401eadc80062cd671cc9a8492c87a6011",
+  "prompts": {
+    "5e8b61bc86db520c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4bbc4f3b-3965-4ca9-8b26-a0385d677297",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Andrew Nesbitt <andrewnez@gmail.com>",
+      "messages": [],
+      "total_additions": 17,
+      "total_deletions": 2,
+      "accepted_lines": 17,
+      "overriden_lines": 0
+    }
+  }
+}
