@@ -42,7 +42,7 @@ RUN RAILS_ENV=production bundle exec rake assets:precompile
 
 # =============================================
 # Stage 4: Runtime with all package managers
-FROM debian:bookworm-slim
+FROM ruby:4.0.2-slim-bookworm
 
 ENV APP_ROOT=/usr/src/app
 ENV DATABASE_PORT=5432
@@ -66,10 +66,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Use bash as default shell (Dokku requires pipefail support)
 RUN ln -sf /bin/bash /bin/sh
-
-# Ruby runtime + gems (only changes when Gemfile changes)
-COPY --from=gem-builder /usr/local/ /usr/local/
-RUN ldconfig
 
 # Node.js + npm + yarn + pnpm + bun
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
@@ -182,9 +178,9 @@ RUN pip3 install --break-system-packages conan
 # Copy Go resolve binary
 COPY --from=go-builder /resolve-bin /usr/local/bin/resolve
 
-# Copy Ruby app code + precompiled assets (only this changes on code pushes)
+# Copy gems, app code, and precompiled assets
+COPY --from=gem-builder /usr/local/bundle /usr/local/bundle
 COPY . $APP_ROOT
-COPY --from=app-builder /usr/local/bundle /usr/local/bundle
 COPY --from=app-builder $APP_ROOT/public/assets $APP_ROOT/public/assets
 COPY --from=app-builder $APP_ROOT/tmp/cache $APP_ROOT/tmp/cache
 
