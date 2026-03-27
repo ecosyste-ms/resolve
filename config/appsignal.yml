@@ -1,0 +1,12 @@
+production:
+  ignore_errors:
+    - ActiveRecord::RecordNotFound
+    - ActionController::RoutingError
+    - ActiveRecord::QueryCanceled
+    - Rack::Timeout::RequestTimeoutException
+    - Faraday::ConnectionFailed
+    - Faraday::SSLError
+    - Rack::Timeout::RequestExpiryError
+    - Faraday::TimeoutError
+    - ActionDispatch::Http::MimeNegotiation::InvalidType
+    - ActionController::BadRequest
