@@ -9,8 +9,8 @@ RUN go mod download
 RUN CGO_ENABLED=0 go build -o /resolve-bin ./cmd/resolve
 
 # =============================================
-# Stage 2: Build Ruby app
-FROM ruby:4.0.2-slim-bookworm AS ruby-builder
+# Stage 2: Install Ruby gems (only rebuilds when Gemfile changes)
+FROM ruby:4.0.2-slim-bookworm AS gem-builder
 
 ENV APP_ROOT=/usr/src/app
 WORKDIR $APP_ROOT
@@ -23,7 +23,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libffi-dev \
     zlib1g-dev \
     libcurl4-openssl-dev \
-    nodejs \
  && rm -rf /var/lib/apt/lists/*
 
 COPY Gemfile Gemfile.lock $APP_ROOT/
@@ -33,12 +32,16 @@ RUN gem update --system \
  && bundle config set without 'test' \
  && bundle install --jobs 4
 
+# =============================================
+# Stage 3: Build Ruby app (rebuilds on code changes)
+FROM gem-builder AS app-builder
+
 COPY . $APP_ROOT
 RUN bundle exec bootsnap precompile --gemfile app/ lib/
 RUN RAILS_ENV=production bundle exec rake assets:precompile
 
 # =============================================
-# Stage 3: Runtime with all package managers
+# Stage 4: Runtime with all package managers
 FROM debian:bookworm-slim
 
 ENV APP_ROOT=/usr/src/app
@@ -61,8 +64,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     xz-utils \
  && rm -rf /var/lib/apt/lists/*
 
-# Ruby (copy entire install from builder)
-COPY --from=ruby-builder /usr/local/ /usr/local/
+# Use bash as default shell (Dokku requires pipefail support)
+RUN ln -sf /bin/bash /bin/sh
+
+# Ruby runtime + gems (only changes when Gemfile changes)
+COPY --from=gem-builder /usr/local/ /usr/local/
 RUN ldconfig
 
 # Node.js + npm + yarn + pnpm + bun
@@ -176,11 +182,11 @@ RUN pip3 install --break-system-packages conan
 # Copy Go resolve binary
 COPY --from=go-builder /resolve-bin /usr/local/bin/resolve
 
-# Copy Ruby app
+# Copy Ruby app code + precompiled assets (only this changes on code pushes)
 COPY . $APP_ROOT
-COPY --from=ruby-builder /usr/local/bundle /usr/local/bundle
-COPY --from=ruby-builder $APP_ROOT/public/assets $APP_ROOT/public/assets
-COPY --from=ruby-builder $APP_ROOT/tmp/cache $APP_ROOT/tmp/cache
+COPY --from=app-builder /usr/local/bundle /usr/local/bundle
+COPY --from=app-builder $APP_ROOT/public/assets $APP_ROOT/public/assets
+COPY --from=app-builder $APP_ROOT/tmp/cache $APP_ROOT/tmp/cache
 
 ENV RUBY_YJIT_ENABLE=1
 
