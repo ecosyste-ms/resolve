@@ -1,8 +1,15 @@
 class Registry < ApplicationRecord
   include EcosystemsApiClient
 
+  SUPPORTED_ECOSYSTEMS = %w[
+    npm rubygems cargo pypi go maven packagist pub hex nuget
+    swift clojars hackage conda deno helm conan cocoapods
+  ].freeze
+
+  scope :supported, -> { where(ecosystem: SUPPORTED_ECOSYSTEMS) }
+
   def self.all_names
-    Registry.all.map(&:name)
+    supported.pluck(:name)
   end
 
   def self.sync_registries

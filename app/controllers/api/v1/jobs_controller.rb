@@ -1,6 +1,15 @@
 class Api::V1::JobsController < Api::V1::ApplicationController
   def create
-    @job = Job.new(registry: params[:registry], package_name: params[:package_name], status: 'pending', ip: request.remote_ip, before: params[:before], version: version)
+    @job = Job.new(
+      registry: params[:registry],
+      ecosystem: params[:ecosystem],
+      package_name: params[:package_name],
+      status: 'pending',
+      ip: request.remote_ip,
+      before: params[:before],
+      version: version,
+      tree: params[:tree] == 'true'
+    )
     if @job.save
       @job.resolve_async
       redirect_to api_v1_job_path(@job)

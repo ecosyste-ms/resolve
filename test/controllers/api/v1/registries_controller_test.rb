@@ -17,6 +17,16 @@ class ApiV1RegistriesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 'rubygems.org', registries[1]['name']
   end
 
+  test 'excludes unsupported ecosystems' do
+    Registry.create!(name: 'hub.docker.com', url: 'https://hub.docker.com', ecosystem: 'docker', packages_count: 500)
+
+    get api_v1_registries_path
+    registries = JSON.parse(@response.body)
+
+    assert_equal 2, registries.length
+    assert_nil registries.find { |r| r['name'] == 'hub.docker.com' }
+  end
+
   test 'registries include expected fields' do
     get api_v1_registries_path
     registry = JSON.parse(@response.body).find { |r| r['name'] == 'rubygems.org' }

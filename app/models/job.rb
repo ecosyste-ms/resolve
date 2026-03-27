@@ -1,12 +1,21 @@
-require 'timeout'
+require 'open3'
 
 class Job < ApplicationRecord
-  validates_presence_of :package_name, :registry
+  PACKAGE_NAME_PATTERN = /\A[@a-zA-Z0-9][\w\-\.\/\:]*\z/
+
+  validates_presence_of :package_name
   validates_uniqueness_of :id
-  validate :registry_name
-  
-  def registry_name
-    if !Registry.all_names.include?(registry)
+  validates_format_of :package_name, with: PACKAGE_NAME_PATTERN, message: "contains invalid characters", allow_blank: true
+  validates_length_of :package_name, maximum: 255
+  validate :registry_or_ecosystem_present
+
+  attr_accessor :ecosystem, :tree
+
+  def registry_or_ecosystem_present
+    if registry.blank? && ecosystem.blank?
+      errors.add(:base, "Either registry or ecosystem must be provided")
+    end
+    if registry.present? && !Registry.all_names.include?(registry)
       errors.add(:registry, "is not included in the list")
     end
   end
@@ -36,16 +45,29 @@ class Job < ApplicationRecord
     update(sidekiq_id: sidekiq_id)
   end
 
+  def self.resolve_binary
+    ENV.fetch('RESOLVE_BINARY', 'resolve')
+  end
+
   def resolve
-    begin
-      Timeout::timeout(60) do
-        source = EcosystemsPackageSource.new({ package_name => version }, registry, before)
-        solver = PubGrub::VersionSolver.new(source: source)
-        result = solver.solve  
-        update(status: 'complete', results: result)
-      end
-    rescue => e
-      update(results: {error: e.inspect}, status: 'error')
+    args = [self.class.resolve_binary]
+    args += ["--registry", registry] if registry.present?
+    args += ["--ecosystem", ecosystem] if ecosystem.present?
+    args += ["--package", package_name]
+    args += ["--version", version] if version.present? && version != ">= 0"
+    args += ["--before", before.iso8601] if before.present?
+    args += ["--tree"] if tree
+    args += ["--api-key", ENV['ECOSYSTEMS_API_KEY']] if ENV['ECOSYSTEMS_API_KEY'].present?
+
+    stdout, stderr, status = Open3.capture3(*args)
+
+    if status.success?
+      update(status: 'complete', results: JSON.parse(stdout))
+    else
+      error_info = JSON.parse(stderr) rescue { error: stderr }
+      update(results: error_info, status: 'error')
     end
+  rescue => e
+    update(results: { error: e.inspect }, status: 'error')
   end
 end
