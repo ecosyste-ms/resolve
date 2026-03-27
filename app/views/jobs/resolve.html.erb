@@ -23,7 +23,7 @@
     </small>
   <% end %>
 
-  <% if @job.status == 'pending' %>
+  <% if %w[pending queued working].include?(@job.status) %>
     Processing dependencies...
     <meta http-equiv="refresh" content="2">
   <% end %>
