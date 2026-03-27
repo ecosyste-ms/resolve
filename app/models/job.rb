@@ -55,9 +55,7 @@ class Job < ApplicationRecord
     args += ["--ecosystem", ecosystem] if ecosystem.present?
     args += ["--package", package_name]
     args += ["--version", version] if version.present? && version != ">= 0"
-    args += ["--before", before.iso8601] if before.present?
     args += ["--tree"] if tree
-    args += ["--api-key", ENV['ECOSYSTEMS_API_KEY']] if ENV['ECOSYSTEMS_API_KEY'].present?
 
     stdout, stderr, status = Open3.capture3(*args)
 
