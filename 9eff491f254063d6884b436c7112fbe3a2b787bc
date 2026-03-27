@@ -1,0 +1,23 @@
+Dockerfile
+  5e8b61bc86db520c 12-13,35-38,44,67-71,185,187-189
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.20",
+  "base_commit_sha": "9eff491f254063d6884b436c7112fbe3a2b787bc",
+  "prompts": {
+    "5e8b61bc86db520c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4bbc4f3b-3965-4ca9-8b26-a0385d677297",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Andrew Nesbitt <andrewnez@gmail.com>",
+      "messages": [],
+      "total_additions": 16,
+      "total_deletions": 10,
+      "accepted_lines": 16,
+      "overriden_lines": 0
+    }
+  }
+}
