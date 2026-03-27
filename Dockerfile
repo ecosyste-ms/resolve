@@ -4,7 +4,7 @@ FROM golang:1.25-bookworm AS go-builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
 WORKDIR /build
-RUN git clone --depth 1 --branch v0.1.0 https://github.com/ecosyste-ms/resolve-cli.git .
+RUN git clone --depth 1 --branch v0.1.1 https://github.com/ecosyste-ms/resolve-cli.git .
 RUN go mod download
 RUN CGO_ENABLED=0 go build -o /resolve-bin ./cmd/resolve
 
