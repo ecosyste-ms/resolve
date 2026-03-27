@@ -42,8 +42,14 @@ paths:
             type: string
         - name: registry
           in: query
-          description: name of the package registry, see /registries for available values
-          required: true
+          description: name of the package registry, see /registries for available values. Either registry or ecosystem is required.
+          required: false
+          schema:
+            type: string
+        - name: ecosystem
+          in: query
+          description: ecosystem/purl type (e.g. gem, npm, cargo). Alternative to registry.
+          required: false
           schema:
             type: string
         - name: before
@@ -59,6 +65,15 @@ paths:
           required: false
           schema:
             type: string
+        - name: tree
+          in: query
+          description: return full dependency tree with PURLs instead of flat name/version map
+          required: false
+          schema:
+            type: string
+            enum:
+              - "true"
+              - "false"
       responses:
         301:
           description: Redirect
