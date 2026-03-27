@@ -52,13 +52,6 @@ paths:
           required: false
           schema:
             type: string
-        - name: before
-          in: query
-          description: resolve only with dependencies before this date
-          required: false
-          schema:
-            type: string
-            format: date-time
         - name: version
           in: query
           description: resolve only with version within this range
@@ -136,8 +129,5 @@ components:
           type: string
         sha256:
           type: string
-        before:
-          type: string
-          format: date-time
         version:
           type: string
