@@ -24,6 +24,7 @@ Rails.application.routes.draw do
   end
 
   get '/resolve', to: 'jobs#resolve', as: :resolve
+  get '/jobs/:id', to: 'jobs#show', as: :job
 
   get '/404', to: 'errors#not_found'
   get '/422', to: 'errors#unprocessable'

@@ -9,7 +9,12 @@ class JobsController < ApplicationController
       @job = Job.create(registry: params[:registry], ecosystem: params[:ecosystem], package_name: params[:package_name], status: 'pending', ip: request.remote_ip, before: params[:before], version: version, tree: params[:tree] == 'true')
       @job.resolve_async
     end
-    @job.check_status if @job.status.in?(%w[queued working])
+    redirect_to job_path(@job)
+  end
+
+  def show
+    @job = Job.find(params[:id])
+    @job.check_status if @job.status.in?(%w[pending queued working])
   end
 
   def version
