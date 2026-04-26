@@ -10,7 +10,7 @@ RUN CGO_ENABLED=0 go build -o /resolve-bin ./cmd/resolve
 
 # =============================================
 # Stage 2: Install Ruby gems (only rebuilds when Gemfile changes)
-FROM ruby:4.0.2-slim-bookworm AS gem-builder
+FROM ruby:4.0.3-slim-bookworm AS gem-builder
 
 ENV APP_ROOT=/usr/src/app
 WORKDIR $APP_ROOT
@@ -42,7 +42,7 @@ RUN RAILS_ENV=production bundle exec rake assets:precompile
 
 # =============================================
 # Stage 4: Runtime with all package managers
-FROM ruby:4.0.2-slim-bookworm
+FROM ruby:4.0.3-slim-bookworm
 
 ENV APP_ROOT=/usr/src/app
 ENV DATABASE_PORT=5432
