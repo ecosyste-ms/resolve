@@ -49,7 +49,6 @@ ENV DATABASE_PORT=5432
 ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR $APP_ROOT
 
-# Base dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
@@ -62,26 +61,44 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     netcat-openbsd \
     unzip \
     xz-utils \
+    python3 \
+    python3-pip \
+    python3-venv \
+    default-jdk-headless \
+    maven \
+    gradle \
+    php-cli \
+    php-zip \
+    php-mbstring \
+    php-xml \
+    php-curl \
+    erlang-base \
+    erlang-dev \
+    elixir \
+    build-essential \
+    libffi-dev \
+    zlib1g-dev \
+    netbase \
  && rm -rf /var/lib/apt/lists/*
 
 # Use bash as default shell (Dokku requires pipefail support)
 RUN ln -sf /bin/bash /bin/sh
 
-# Node.js + npm + yarn + pnpm + bun
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
- && apt-get install -y --no-install-recommends nodejs \
- && npm install -g yarn pnpm \
- && rm -rf /var/lib/apt/lists/*
+# Node.js (official binary; avoids adding the nodesource apt repo)
+ARG NODE_VERSION=22.20.0
+RUN ARCH=$(dpkg --print-architecture | sed 's/amd64/x64/') && \
+    curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${ARCH}.tar.xz" \
+      | tar -xJ -C /usr/local --strip-components=1
+RUN npm install -g yarn pnpm
+
+# Bun
 RUN curl -fsSL https://bun.sh/install | bash
 ENV PATH="/root/.bun/bin:${PATH}"
 
-# Python + pip + poetry + uv
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    python3-pip \
-    python3-venv \
- && rm -rf /var/lib/apt/lists/*
+# Poetry
 RUN pip3 install --break-system-packages poetry
+
+# uv
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 ENV PATH="/root/.local/bin:${PATH}"
 
@@ -93,43 +110,23 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 COPY --from=go-builder /usr/local/go /usr/local/go
 ENV PATH="/usr/local/go/bin:${PATH}"
 
-# Java + Maven + Gradle
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    default-jdk-headless \
-    maven \
-    gradle \
- && rm -rf /var/lib/apt/lists/*
-
 # .NET SDK (nuget)
 RUN curl -fsSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 8.0 --install-dir /usr/share/dotnet
 ENV PATH="/usr/share/dotnet:${PATH}"
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
 
-# PHP + Composer
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    php-cli \
-    php-zip \
-    php-mbstring \
-    php-xml \
-    php-curl \
- && rm -rf /var/lib/apt/lists/*
+# Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Dart SDK (pub)
 RUN DART_ARCH=$(dpkg --print-architecture | sed 's/amd64/x64/;s/arm64/arm64/') && \
-    curl -fsSL "https://storage.googleapis.com/dart-archive/channels/stable/release/latest/sdk/dartsdk-linux-${DART_ARCH}-release.zip" -o /tmp/dart.zip \
- && unzip -q /tmp/dart.zip -d /opt \
- && rm /tmp/dart.zip
+    curl -fsSL "https://storage.googleapis.com/dart-archive/channels/stable/release/latest/sdk/dartsdk-linux-${DART_ARCH}-release.zip" -o /tmp/dart.zip
+RUN unzip -q /tmp/dart.zip -d /opt && rm /tmp/dart.zip
 ENV PATH="/opt/dart-sdk/bin:${PATH}"
 
-# Elixir + Mix
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    erlang-base \
-    erlang-dev \
-    elixir \
- && rm -rf /var/lib/apt/lists/* \
- && mix local.hex --force \
- && mix local.rebar --force
+# Mix (hex/rebar for the elixir installed above)
+RUN mix local.hex --force
+RUN mix local.rebar --force
 
 # Swift
 RUN SWIFT_ARCH=$(dpkg --print-architecture | sed 's/amd64/x86_64/;s/arm64/aarch64/') && \
@@ -141,9 +138,6 @@ RUN SWIFT_ARCH=$(dpkg --print-architecture | sed 's/amd64/x86_64/;s/arm64/aarch6
         | tar xz --strip-components=1 -C /usr; \
     fi
 
-# Helm
-RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-
 # Deno
 RUN curl -fsSL https://deno.land/install.sh | sh
 ENV DENO_DIR="/root/.deno"
@@ -151,26 +145,13 @@ ENV PATH="/root/.deno/bin:${PATH}"
 
 # Conda (miniconda)
 RUN ARCH=$(uname -m) && \
-    curl -fsSL https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-${ARCH}.sh -o /tmp/miniconda.sh \
- && bash /tmp/miniconda.sh -b -p /opt/conda \
- && rm /tmp/miniconda.sh
+    curl -fsSL https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-${ARCH}.sh -o /tmp/miniconda.sh
+RUN bash /tmp/miniconda.sh -b -p /opt/conda && rm /tmp/miniconda.sh
 ENV PATH="/opt/conda/bin:${PATH}"
 
-# Build tools needed by stack, native gem extensions, etc.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libffi-dev \
-    libgmp-dev \
-    zlib1g-dev \
-    netbase \
- && rm -rf /var/lib/apt/lists/*
-
-# Haskell Stack
-RUN curl -sSL https://get.haskellstack.org/ | sh
-
 # Leiningen (Clojure)
-RUN curl -fsSL https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein -o /usr/local/bin/lein \
- && chmod +x /usr/local/bin/lein
+RUN curl -fsSL https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein -o /usr/local/bin/lein
+RUN chmod +x /usr/local/bin/lein
 
 # Conan (C/C++)
 RUN pip3 install --break-system-packages conan

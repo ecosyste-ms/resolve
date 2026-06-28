@@ -3,7 +3,7 @@ class Registry < ApplicationRecord
 
   SUPPORTED_ECOSYSTEMS = %w[
     npm rubygems cargo pypi go maven packagist pub hex nuget
-    swift clojars hackage conda deno helm conan cocoapods
+    swift clojars conda deno conan
   ].freeze
 
   scope :supported, -> { where(ecosystem: SUPPORTED_ECOSYSTEMS) }
