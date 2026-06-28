@@ -48,3 +48,59 @@ jobs:
           POSTGRES_HOST: localhost
           POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
         run: bundle exec rails db:test:prepare test
+
+  integration:
+    name: Integration
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: resolve
+          POSTGRES_DB: resolve_test
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install dependent libraries
+        run: sudo apt-get update && sudo apt-get install libpq-dev
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: stable
+      - name: Set up PHP and Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer
+
+      - name: Build resolve binary
+        run: |
+          ref=$(grep -oE 'branch v[0-9.]+' Dockerfile | awk '{print $2}')
+          git clone --depth 1 --branch "$ref" https://github.com/ecosyste-ms/resolve-cli.git /tmp/resolve-cli
+          cd /tmp/resolve-cli
+          go build -o /tmp/resolve ./cmd/resolve
+
+      - name: Run integration tests
+        env:
+          RAILS_ENV: test
+          POSTGRES_DB: resolve_test
+          POSTGRES_USER: resolve
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
+          RESOLVE_BINARY: /tmp/resolve
+        run: |
+          bundle exec rails db:test:prepare
+          bundle exec rails test test/integration
