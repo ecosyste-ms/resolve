@@ -28,14 +28,32 @@ class EcosystemsPackageSource < PubGrub::BasicPackageSource
   end
 
   def fetch_package(package_name)
+    before_str = if @before.present?
+      @before.respond_to?(:iso8601) ? @before.iso8601 : @before.to_s
+    end
+
     url = "https://packages.ecosyste.ms/api/v1/registries/#{@registry}/packages/#{package_name}/versions?per_page=1000"
-    url += "&before=#{@before}" if @before
+    url += "&before=#{before_str}" if before_str.present?
     resp = ecosystems_connection.get(url)
     json = JSON.parse(resp.body) # TODO handle errors
    
     @packages[package_name] = {}
+
+    before_time = if @before.present?
+      if @before.is_a?(Time) || @before.is_a?(DateTime)
+        @before
+      else
+        Time.parse(@before.to_s) rescue nil
+      end
+    end
+
     # TODO sort versions
     json.each do |version|
+      if before_time && version['published_at'].present?
+        pub_time = Time.parse(version['published_at']) rescue nil
+        next if pub_time && pub_time > before_time
+      end
+
       # next if version['metadata']['platform'].present?
       @packages[package_name][version['number']] = {}
       version['dependencies'].each do |dependency|

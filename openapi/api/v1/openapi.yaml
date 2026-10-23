@@ -52,6 +52,20 @@ paths:
           required: false
           schema:
             type: string
+        - name: date
+          in: query
+          description: resolve only with package releases published on or before this date (ISO 8601 or YYYY-MM-DD)
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: before
+          in: query
+          description: alias for date parameter, resolve only with dependencies published before this date
+          required: false
+          schema:
+            type: string
+            format: date-time
         - name: version
           in: query
           description: resolve only with version within this range
@@ -80,12 +94,12 @@ paths:
       summary: fetch job by id
       operationId: getJob
       parameters:
-        - in: path
-          name: jobID
+        - name: jobID
+          in: path
+          description: id of the job
+          required: true
           schema:
             type: string
-          required: true
-          description: id of job
       responses:
         200:
           description: OK
@@ -106,10 +120,19 @@ components:
           type: string
         packages_count:
           type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
     Job:
       type: object
       properties:
         id:
+          type: string
+          format: uuid
+        url:
           type: string
         package_name:
           type: string
@@ -129,5 +152,11 @@ components:
           type: string
         sha256:
           type: string
+        before:
+          type: string
+          format: date-time
+        date:
+          type: string
+          format: date-time
         version:
           type: string

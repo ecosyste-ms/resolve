@@ -11,6 +11,23 @@ class Job < ApplicationRecord
 
   attr_accessor :ecosystem, :tree
 
+  def date
+    before
+  end
+
+  def date=(val)
+    self.before = val
+  end
+
+  def before_iso8601
+    return nil if before.blank?
+    if before.respond_to?(:iso8601)
+      before.iso8601
+    else
+      Time.parse(before.to_s).iso8601 rescue before.to_s
+    end
+  end
+
   def registry_or_ecosystem_present
     if registry.blank? && ecosystem.blank?
       errors.add(:base, "Either registry or ecosystem must be provided")
@@ -55,6 +72,7 @@ class Job < ApplicationRecord
     args += ["--ecosystem", ecosystem] if ecosystem.present?
     args += ["--package", package_name]
     args += ["--version", version] if version.present? && version != ">= 0"
+    args += ["--before", before_iso8601] if before.present?
     args += ["--tree"] if tree
 
     stdout, stderr, status = Open3.capture3(*args)

@@ -140,6 +140,27 @@ class JobTest < ActiveSupport::TestCase
     assert_equal 'complete', job.status
   end
 
+  test "resolve passes before flag when before is set" do
+    before_date = Time.utc(2023, 6, 1, 12, 0, 0)
+    job = Job.create!(registry: 'rubygems.org', package_name: 'split', status: 'pending', before: before_date)
+
+    Open3.expects(:capture3).with(
+      Job.resolve_binary,
+      '--registry', 'rubygems.org',
+      '--package', 'split',
+      '--before', before_date.iso8601
+    ).returns(['{}', '', stub(success?: true)])
+
+    job.resolve
+    assert_equal 'complete', job.status
+  end
+
+  test "job supports date alias for before" do
+    job = Job.new(registry: 'rubygems.org', package_name: 'split', status: 'pending')
+    job.date = '2023-06-01'
+    assert_equal job.before, job.date
+  end
+
   test "resolve stores error on binary failure" do
     job = Job.create!(registry: 'rubygems.org', package_name: 'split', status: 'pending')
 

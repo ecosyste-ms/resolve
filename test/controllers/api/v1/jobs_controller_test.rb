@@ -34,6 +34,20 @@ class ApiV1JobsControllerTest < ActionDispatch::IntegrationTest
     assert_response :redirect
   end
 
+  test 'submit a job with date param' do
+    post api_v1_jobs_path(registry: @registry.name, package_name: 'rails', date: '2023-06-01T00:00:00Z')
+    assert_response :redirect
+    job = Job.order(created_at: :desc).first
+    assert_not_nil job.before
+  end
+
+  test 'submit a job with before param' do
+    post api_v1_jobs_path(registry: @registry.name, package_name: 'rails', before: '2023-06-01T00:00:00Z')
+    assert_response :redirect
+    job = Job.order(created_at: :desc).first
+    assert_not_nil job.before
+  end
+
   test 'check on a job' do
     @job = Job.create(registry: @registry.name, package_name: 'rails')
     @job.expects(:check_status)

@@ -1,12 +1,13 @@
 class Api::V1::JobsController < Api::V1::ApplicationController
   def create
+    cutoff = params[:date].presence || params[:before]
     @job = Job.new(
       registry: params[:registry],
       ecosystem: params[:ecosystem],
       package_name: params[:package_name],
       status: 'pending',
       ip: request.remote_ip,
-      before: params[:before],
+      before: cutoff,
       version: version,
       tree: params[:tree] == 'true'
     )
